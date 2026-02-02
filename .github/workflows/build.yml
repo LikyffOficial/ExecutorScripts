@@ -1,75 +1,25 @@
-cat > .github/workflows/build.yml << 'EOF'
-name: Build Android APK
-
-on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-  workflow_dispatch:
-
-jobs:
+cat > .github/workflows/build.yml << 'HEREDOC' name: Build Android APK on: push: 
+    branches:
+      - main - master pull_request: branches: - main - master workflow_dispatch: jobs: 
   build:
     runs-on: ubuntu-latest
     
-    steps:
-    - name: 📥 Checkout código
-      uses: actions/checkout@v3
-    
-    - name: 🐍 Configurar Python 3.10
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-    
-    - name: 📦 Instalar dependências do sistema
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          git \
-          zip \
-          unzip \
-          openjdk-17-jdk \
-          autoconf \
-          libtool \
-          pkg-config \
-          zlib1g-dev \
-          libncurses5-dev \
-          libncursesw5-dev \
-          libtinfo5 \
-          cmake \
-          libffi-dev \
-          libssl-dev \
-          ccache
-    
-    - name: 💾 Cache Buildozer
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.buildozer
-          .buildozer
-        key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
-        restore-keys: |
-          ${{ runner.os }}-buildozer-
-    
-    - name: 🔧 Instalar Buildozer e Cython
-      run: |
-        pip install --upgrade pip
-        pip install buildozer cython==0.29.33
-    
-    - name: 🏗️ Build APK
-      run: |
-        yes | buildozer android debug
-    
-    - name: 📤 Upload APK
-      uses: actions/upload-artifact@v3
-      with:
-        name: executorscripts-apk
-        path: bin/*.apk
-        retention-days: 30
-    
-    - name: ✅ Informações do Build
-      run: |
-        echo "✅ Build concluído com sucesso!"
-        echo "📦 APK disponível nos artifacts"
-        ls -lh bin/*.apk
-EOF
+    steps: - name: Checkout code uses: actions/checkout@v3
+      
+      - name: Set up Python uses: actions/setup-python@v4 with: python-version: '3.10'
+      
+      - name: Install system dependencies run: | sudo apt-get update sudo apt-get 
+          install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev 
+          libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+      
+      - name: Install Buildozer and Cython run: | pip install --upgrade pip pip install 
+          buildozer cython==0.29.33
+      
+      - name: Build APK with Buildozer run: | yes | buildozer android debug
+      
+      - name: Upload APK artifact uses: actions/upload-artifact@v3 with: name: 
+          executorscripts-apk path: bin/*.apk retention-days: 30
+      
+      - name: Display build info run: | echo "Build completed successfully" ls -lh 
+          bin/*.apk
+HEREDOC
